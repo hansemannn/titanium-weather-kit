@@ -2,6 +2,8 @@
 
 Use the iOS 16+ WeatherKit APIs in Titanium!
 
+<img src=".github/weatherkit-og.jpg" />
+
 ## Requirements
 
 - [x] Xcode 14+
