@@ -1,0 +1,19 @@
+#
+# this is your module manifest and used by Titanium
+# during compilation, packaging, distribution, etc.
+#
+version: 1.0.0
+apiversion: 2
+architectures: arm64 x86_64
+mac: true
+description: titanium-weather-kit
+author: Hans Knöchel
+license: MIT
+copyright: Copyright (c) 2022 by TiDev
+
+# these should not be edited
+name: titanium-weather-kit
+moduleid: ti.weatherkit
+guid: 869eaa97-9e07-4942-9f52-cfc2a4deb06e
+platform: iphone
+minsdk: 10.0.0
