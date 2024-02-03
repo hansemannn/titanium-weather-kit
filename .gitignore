@@ -2,6 +2,7 @@
 tmp
 bin
 build
+dist
 
 */*/modules
 */*/modules*
@@ -38,3 +39,4 @@ android/platform/README.md
 /ios/dist
 /iOS/Carthage
 /android/.gradle
+/dist/modules

@@ -22,30 +22,41 @@ class TiWeatherkitModule: TiModule {
     return "ti.weatherkit"
   }
   
-  @objc(getWeather:asyncParam:)
-  func getWeather(args: [Any]) async {
+  @objc(getWeather:)
+  func getWeather(args: [Any]) {
     guard let params = args.first as? [String: Any],
     let callback = params["callback"] as? KrollCallback else { return }
     
     let location = CLLocation(latitude: params["latitude"] as! CLLocationDegrees,
                               longitude: params["longitude"] as! CLLocationDegrees)
     
-    let weather = try! await WeatherService.shared.weather(for: location)
-    
-    let weatherData: [String: Any] = [
-      "currentWeather": mapped(weather.currentWeather),
-      "availability": [
-        "alertAvailability": weather.availability.alertAvailability.rawValue,
-        "minuteAvailability": weather.availability.minuteAvailability.rawValue
-      ],
-      // TODO: Map these as well
-      "minuteForecast": [:],
-      "hourlyForecast": [:],
-      "dailyForecast": [:],
-      "weatherAlerts": []
-    ]
-    
-    callback.call([weatherData], thisObject: self)
+    Task {
+      do {
+        let weather = try await WeatherService.shared.weather(for: location)
+                
+        let weatherData: [String: Any] = [
+          "success": true,
+          "currentWeather": mapped(weather.currentWeather),
+          "availability": [
+            "alertAvailability": weather.availability.alertAvailability.rawValue,
+            "minuteAvailability": weather.availability.minuteAvailability.rawValue
+          ],
+          // TODO: Map these as well
+          "minuteForecast": [:],
+          "hourlyForecast": [:],
+          "dailyForecast": [:],
+          "weatherAlerts": []
+        ]
+        
+        DispatchQueue.main.async {
+          callback.call([weatherData], thisObject: self)
+        }
+      } catch {
+        DispatchQueue.main.async {
+          callback.call([["success": false, "error": error.localizedDescription]], thisObject: self)
+        }
+      }
+    }
   }
 }
 
@@ -81,7 +92,7 @@ extension TiWeatherkitModule {
       "metadata": [
         "location": [
           "latitude": currentWeather.metadata.location.coordinate.latitude,
-          "latitude": currentWeather.metadata.location.coordinate.longitude,
+          "longitude": currentWeather.metadata.location.coordinate.longitude,
         ],
         "date": currentWeather.metadata.date,
         "expirationDate": currentWeather.metadata.expirationDate
